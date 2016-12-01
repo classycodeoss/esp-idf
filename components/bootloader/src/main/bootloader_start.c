@@ -272,28 +272,8 @@ void bootloader_main()
         bootloader_munmap(ota_select_map);
 
         if(sa.ota_seq == 0xFFFFFFFF && sb.ota_seq == 0xFFFFFFFF) {
-            // init status flash
-            load_part_pos = bs.ota[0];
-            sa.ota_seq = 0x01;
-            sa.crc = ota_select_crc(&sa);
-            sb.ota_seq = 0x00;
-            sb.crc = ota_select_crc(&sb);
-
-            Cache_Read_Disable(0);  
-            spiRet1 = SPIEraseSector(bs.ota_info.offset/0x1000);
-            spiRet2 = SPIEraseSector(bs.ota_info.offset/0x1000+1);
-            if (spiRet1 != SPI_FLASH_RESULT_OK || spiRet2 != SPI_FLASH_RESULT_OK ) {  
-                ESP_LOGE(TAG, SPI_ERROR_LOG);
-                return;
-            } 
-            spiRet1 = SPIWrite(bs.ota_info.offset,(uint32_t *)&sa,sizeof(esp_ota_select_entry_t));
-            spiRet2 = SPIWrite(bs.ota_info.offset + 0x1000,(uint32_t *)&sb,sizeof(esp_ota_select_entry_t));
-            if (spiRet1 != SPI_FLASH_RESULT_OK || spiRet2 != SPI_FLASH_RESULT_OK ) {  
-                ESP_LOGE(TAG, SPI_ERROR_LOG);
-                return;
-            } 
-            Cache_Read_Enable(0);  
-            //TODO:write data in ota info
+            // Partition is empty - boot into factory bin.
+            load_part_pos = bs.factory;
         } else  {
             if(ota_select_valid(&sa) && ota_select_valid(&sb)) {
                 load_part_pos = bs.ota[(((sa.ota_seq > sb.ota_seq)?sa.ota_seq:sb.ota_seq) - 1)%bs.app_count];
