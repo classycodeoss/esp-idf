@@ -305,7 +305,7 @@ esp_err_t esp_ota_set_boot_partition(const esp_partition_t *partition)
         if (partition->subtype == ESP_PARTITION_SUBTYPE_APP_FACTORY) {
             find_partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_OTA, NULL);
             if (find_partition != NULL) {
-                return esp_partition_erase_range(find_partition, find_partition->address, find_partition->size);
+                return esp_partition_erase_range(find_partition, 0, find_partition->size);
             } else {
                 return ESP_ERR_NOT_FOUND;
             }
