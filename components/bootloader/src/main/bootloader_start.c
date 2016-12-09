@@ -273,7 +273,9 @@ void bootloader_main()
             return;
         }
         sa = ota_select_map[0];
-        sb = ota_select_map[1];
+        // TODO
+        // The [128] is a workaround to make this consistent with the app_update component.
+        sb = ota_select_map[128];
         bootloader_munmap(ota_select_map);
 
         if(sa.ota_seq == 0xFFFFFFFF && sb.ota_seq == 0xFFFFFFFF) {
